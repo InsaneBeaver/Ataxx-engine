@@ -191,7 +191,7 @@ uint64_t _perft(board ** boards, short int **all_moves, int depth_to_go)
 	board * currentboard = boards[depth_to_go];
 	board * nextboard = NULL;
 	if(depth_to_go != 0)
-		nextboard = boards[depth_to_go - 1]; //= boards[depth_to_go - 1]; 
+		nextboard = boards[depth_to_go - 1]; 
 	short int * moves = all_moves[depth_to_go];
 	Sides side_to_move = currentboard->get_side_to_move();
 	const char * board_representation = currentboard->get_board_representation();
