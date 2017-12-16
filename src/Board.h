@@ -4,12 +4,14 @@
 #include <cstdint>
 #include <stddef.h>
 
+
 const char EMPTY_SQUARE = 0;
 const char BLUE_STONE = 1;
 const char RED_STONE = 2;
 const char BLOCKED_SQUARE = 3;
 
 enum BoardType {NORMAL};
+
 enum Sides {BLUE, RED};
 
 const char WIDTH = 11;
@@ -46,34 +48,22 @@ inline char get_square_repr(char square_type)
 	return square_repr;
 }
 
-class board
+struct board
 {
-public:
 	board();
 	board(BoardType);
 	~board();
 	void print_board();
 	char get_type(char x, char y);
 	void set_type(char type, char x, char y);
-	void generate_moves(Sides side, short int * moves);
+	void generate_moves(short int * moves);
 	void play_move(short int move);
 	void init_board();
 	void load_board(const char * board_representation, Sides side_to_move);
-	const char * get_board_representation();
-	Sides get_side_to_move();
-	
-private:
 	
 	Sides side_to_move;
 	char * board_representation;
 	const BoardType board_type;
-	
-
-	
-	
-	
-	
-	
 };
 
 #endif

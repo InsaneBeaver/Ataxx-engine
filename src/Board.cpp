@@ -30,6 +30,7 @@ void board::init_board()
 	set_type(BLUE_STONE, 6, 0);
 	set_type(RED_STONE, 0, 0);
 	set_type(RED_STONE, 6, 6);
+	side_to_move = BLUE;
 	
 }
 
@@ -59,11 +60,11 @@ void board::set_type(char type, char x, char y)
 	board_representation[(y + 2) * WIDTH + x + 2] = type;
 }
 
-void board::generate_moves(Sides side, short int * moves)
+void board::generate_moves(short int * moves)
 {
-	const char friendly_stone = side == BLUE ? BLUE_STONE : RED_STONE;
-	const char ennemy_stone = side == BLUE ? RED_STONE : BLUE_STONE;
-	const char duplication_origin_square = PRODUCTDIMENSIONS + (side == BLUE ? 0 : 1);
+	const char friendly_stone = side_to_move == BLUE ? BLUE_STONE : RED_STONE;
+	const char ennemy_stone = side_to_move == BLUE ? RED_STONE : BLUE_STONE;
+	const char duplication_origin_square = PRODUCTDIMENSIONS + (side_to_move == BLUE ? 0 : 1);
 	unsigned int iMoves = 0;
 	int move;
 	char type;
@@ -145,64 +146,42 @@ void board::load_board(const char * board_representation, Sides side_to_move)
 		this->board_representation[pos] = board_representation[pos];
 }
 
-const char * board::get_board_representation()
-{
-	return board_representation;
-}
-
-Sides board::get_side_to_move()
-{
-	return side_to_move;
-}
-
-uint64_t _perft(board ** boards, short int **all_moves, int depth_to_go);
+uint64_t _perft(board boards[20], short int all_moves[20][100], int depth_to_go);
 
 uint64_t perft(int depth)
 {
 
-	short int ** all_moves = new short int *[depth];
-	board ** boards = new board *[depth];
-	for(int i = 0; i < depth; i++)
-	{
-		boards[i] = new board;
-		all_moves[i] = new short int[200];
-	}
-	
-	
-	boards[depth - 1]->init_board();
+	short int all_moves[20][100];
+	board boards[20];
+
+	boards[depth - 1].init_board();
 	uint64_t res = _perft(boards, all_moves, depth - 1);
-	
-	for(int i = 0; i < depth; i++)
-	{
-		delete[] all_moves[i];
-		delete boards[i];
-	}
-	delete[] boards;
-	delete[] all_moves;
 	
 	return res;
 	
 }
 
-uint64_t _perft(board ** boards, short int **all_moves, int depth_to_go)
+uint64_t _perft(board boards[20], short int all_moves[20][100], int depth_to_go)
 {
 	uint64_t tot = 0;
 	
-	board * currentboard = boards[depth_to_go];
-	board * nextboard = NULL;
-	if(depth_to_go != 0)
-		nextboard = boards[depth_to_go - 1]; 
-	short int * moves = all_moves[depth_to_go];
-	Sides side_to_move = currentboard->get_side_to_move();
-	const char * board_representation = currentboard->get_board_representation();
-	currentboard->generate_moves(side_to_move, moves);
-	for(unsigned int iMoves = 0; moves[iMoves] != 0; iMoves++)
+	board & currentboard = boards[depth_to_go];
+	
+	Sides side_to_move = currentboard.side_to_move;
+	const char * board_representation = currentboard.board_representation;
+	currentboard.generate_moves(all_moves[depth_to_go]);
+	
+	if(depth_to_go == 0)
+		for(unsigned int iMoves = 0; all_moves[depth_to_go][iMoves] != 0; iMoves++) tot++;
+
+	else
 	{
-		if(depth_to_go == 0) tot++;
-		else
+		
+		board & nextboard = boards[depth_to_go - 1]; 
+		for(unsigned int iMoves = 0; all_moves[depth_to_go][iMoves] != 0; iMoves++)
 		{
-			nextboard->load_board(board_representation, side_to_move);
-			nextboard->play_move(moves[iMoves]);
+			nextboard.load_board(board_representation, side_to_move);
+			nextboard.play_move(all_moves[depth_to_go][iMoves]);
 			tot += _perft(boards, all_moves, depth_to_go - 1);
 		}
 	}
@@ -211,13 +190,4 @@ uint64_t _perft(board ** boards, short int **all_moves, int depth_to_go)
 	
 	
 	
-}
-
-int main()
-{
-	for(int i = 1; i < 8; i++)
-		printf("%i %i\n", i, perft(i));
-	//monboard2.play_move(coup);
-	//monboard2.print_board();
-	return 0;
 }
