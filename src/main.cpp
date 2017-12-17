@@ -3,11 +3,14 @@
 int main()
 {
 	node nodes[50];
-	for(int i = 7; i < 10; i++)
+	nodes[7]._board.init_board();
+	
+	for(int i = 0; i < 40; i++)
 	{
-		nodes[i]._board.init_board();
-		printf("%i %f\n", i, negamax(nodes, i, -1e06, 1e06, -1));
-		nodes[i].dank.print_board();
+		transposition_table tt(1e07);
+		printf("%i %f\n", 7, negamax(nodes, tt, 7, -1e06, 1e06, -1));
+		nodes[7]._board.play_move(nodes[7].dank);
+		nodes[7]._board.print_board();
 	}
 	return 0;
 }

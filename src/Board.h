@@ -61,6 +61,9 @@ struct board
 	void play_move(short int move);
 	void init_board();
 	void load_board(const char * board_representation, Sides side_to_move);
+	void load_board(board & _board);
+	
+	bool compare(board & _board);
 	
 	Sides side_to_move;
 	char * board_representation;

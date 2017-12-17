@@ -19,6 +19,5 @@ double evaluate(board & _board)
 		}
 	}
 	if(_board.side_to_move == RED) tot *= -1;
-	//tot += abstot * sqrt(abstot) / 10000;
 	return tot;
 }

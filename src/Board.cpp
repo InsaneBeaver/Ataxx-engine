@@ -146,6 +146,21 @@ void board::load_board(const char * board_representation, Sides side_to_move)
 		this->board_representation[pos] = board_representation[pos];
 }
 
+void board::load_board(board & _board)
+{
+	load_board(_board.board_representation, _board.side_to_move);
+}
+
+bool board::compare(board & _board)
+{
+	bool is_identical = true;
+	is_identical &= _board.side_to_move == side_to_move;
+	for(int i = 0; i < PRODUCTDIMENSIONS && is_identical; i++)
+		is_identical &= _board.board_representation[i] == board_representation[i];
+	
+	return is_identical;
+}
+
 uint64_t _perft(board boards[20], short int all_moves[20][100], int depth_to_go);
 
 uint64_t perft(int depth)
