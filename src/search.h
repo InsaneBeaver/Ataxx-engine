@@ -8,6 +8,7 @@ using namespace std;
 struct node
 {
 	board _board;
+	board dank;
 	short int moves[100];
 };
 

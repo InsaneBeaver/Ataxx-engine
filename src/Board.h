@@ -24,6 +24,7 @@ const char BLUE_STONE_DUPLICATION_ORIGIN_SQUARE = PRODUCTDIMENSIONS;
 const char RED_STONE_DUPLICATION_ORIGIN_SQUARE = PRODUCTDIMENSIONS + 1;
 const char NULLMOVE = 0; 
 
+
 inline char get_square_repr(char square_type)
 {
 	char square_repr;

@@ -115,7 +115,7 @@ void board::generate_moves(short int * moves)
 			}
 		}
 	
-	moves[iMoves] = 0;
+	moves[iMoves] = NULLMOVE;
 	
 		
 }
