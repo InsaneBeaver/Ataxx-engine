@@ -2,7 +2,7 @@
 
 
 
-double negamax(node * nodes, transposition_table & tt, int depth_to_go, double alpha, double beta, int color)
+double negamax(node * nodes, transposition_table & tt, uint64_t time_limit, int depth_to_go, double alpha, double beta, int color)
 {
 	node & current_node = nodes[depth_to_go];
 	double best_value = -10000;
@@ -24,6 +24,7 @@ double negamax(node * nodes, transposition_table & tt, int depth_to_go, double a
 	
 	else
 	{
+		struct timeval tv;
 		double v;
 		node & next_node = nodes[depth_to_go - 1];
 		
@@ -31,11 +32,14 @@ double negamax(node * nodes, transposition_table & tt, int depth_to_go, double a
 
 		for(unsigned int iMoves = 0; current_node.moves[iMoves] != NULLMOVE; iMoves++)
 		{
+			gettimeofday(&tv,NULL);
+			if(tv.tv_usec + tv.tv_sec * 1e06 > time_limit) 
+				goto end;
+			
 			next_node._board.load_board(current_node._board.board_representation, current_node._board.side_to_move);
 			next_node._board.play_move(current_node.moves[iMoves]);
 			
-				
-			v = -negamax(nodes, tt, depth_to_go - 1, -beta, -alpha, -color);
+			v = -negamax(nodes, tt, time_limit, depth_to_go - 1, -beta, -alpha, -color);
 			if(best_value < v)
 			{
 				current_node.dank = current_node.moves[iMoves];
@@ -51,5 +55,6 @@ double negamax(node * nodes, transposition_table & tt, int depth_to_go, double a
 	if(!collision)
 		tt.add_position(current_node._board, hash, best_value);
 	
+	end: 
 	return best_value;
 }

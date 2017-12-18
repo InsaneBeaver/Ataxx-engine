@@ -4,6 +4,7 @@
 #include "eval.h"
 #include "transposition_table.h"
 #include <algorithm>
+#include <sys/time.h>
 
 using namespace std;
 struct node
@@ -13,7 +14,7 @@ struct node
 	short int moves[256];
 };
 
-double negamax(node nodes[50], transposition_table & tt, int depth_to_go, double alpha, double beta, int color);
+double negamax(node nodes[50], transposition_table & tt, uint64_t time_limit, int depth_to_go, double alpha, double beta, int color);
 
 
 
