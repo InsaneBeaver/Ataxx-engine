@@ -19,7 +19,7 @@ double negamax(node * nodes, transposition_table & tt, uint64_t time_limit, int 
 	else if(depth_to_go == 0)
 	{
 		//current_node.dank.load_board(current_node._board.board_representation, current_node._board.side_to_move);
-		best_value = color * evaluate(current_node._board);
+		best_value = /*color **/ evaluate(current_node._board);
 	}
 	
 	else

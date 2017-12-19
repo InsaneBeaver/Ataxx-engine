@@ -10,7 +10,7 @@ const char BLUE_STONE = 1;
 const char RED_STONE = 2;
 const char BLOCKED_SQUARE = 3;
 
-enum BoardType {NORMAL};
+enum BoardType {NORMAL, CENTRALGAPS};
 
 enum Sides {BLUE, RED};
 
@@ -43,7 +43,7 @@ inline char get_square_repr(char square_type)
 			square_repr = 'x';
 			break;
 		default:
-			square_repr = ' ';
+			square_repr = '?';
 			break;
 	}
 	return square_repr;
