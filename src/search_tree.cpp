@@ -38,7 +38,6 @@ int search_tree::rank_move(short int move, board & _board)
 	char first_part = move >> 8;
 	if(first_part >= PRODUCTDIMENSIONS) rank += 4;
 	char second_part = (move << 8) >> 8;
-	
 	int count = 0;
 	const char ennemy_stone = _board.side_to_move == BLUE ? RED_STONE : BLUE_STONE;	
 	for(char delta1 = -1; delta1 <= 1; delta1++)
@@ -125,6 +124,7 @@ double search_tree::negamax(int depth_to_go, double alpha, double beta, int colo
 					nodes[i].pv[depth_to_go] = nodes[i].pv[depth_to_go - 1];
 
 				best_value = v;
+				
 			}
 			
 			alpha = max(alpha, v);
@@ -139,6 +139,7 @@ double search_tree::negamax(int depth_to_go, double alpha, double beta, int colo
 		tt->add_position(current_node._board, hash, best_value, depth_to_go);
 
 	end: 
+	evals[((short int)(current_node.pv[depth_to_go] << 8) >> 8)]+= 1 * color;
 	return best_value;
 }
 

@@ -43,9 +43,8 @@ private:
 	unsigned int depth;
 	double score;
 	int ranks[MAX_MOVES_IN_POSITION];
-
 	int rank_move(short int move, board & _board);
-	void sort_moves(node & _node);
+	void sort_moves(node & _node); 
 
 
 };

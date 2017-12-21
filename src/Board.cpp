@@ -21,10 +21,17 @@ board::board() : board_type(CENTRALGAPS)
 
 	for(char pos = 0; pos < PRODUCTDIMENSIONS; pos++)
 	{
-		if(pos % WIDTH <= 1 || pos % WIDTH >= WIDTH - 2 || pos < 2 * HEIGHT || pos > PRODUCTDIMENSIONS - 2 * HEIGHT)
+		if(pos % WIDTH <= 1  || pos % WIDTH >= WIDTH - 2 || pos < 2 * HEIGHT || pos > PRODUCTDIMENSIONS - 2 * HEIGHT)
 			board_representation[pos] = BLOCKED_SQUARE;
 		else
 			board_representation[pos] = EMPTY_SQUARE;
+	}
+	if(board_type == CENTRALGAPS)
+	{
+		set_type(BLOCKED_SQUARE, 2, 2);
+		set_type(BLOCKED_SQUARE, 4, 2);
+		set_type(BLOCKED_SQUARE, 2, 4);
+		set_type(BLOCKED_SQUARE, 4, 4);
 	}
 }
 
@@ -37,13 +44,15 @@ board::~board()
 
 void board::init_board()
 {	
-	if(board_type == CENTRALGAPS)
+
+	for(char pos = 2 * WIDTH; pos < PRODUCTDIMENSIONS - 2 * WIDTH; pos++)
 	{
-		set_type(BLOCKED_SQUARE, 2, 2);
-		set_type(BLOCKED_SQUARE, 4, 2);
-		set_type(BLOCKED_SQUARE, 2, 4);
-		set_type(BLOCKED_SQUARE, 4, 4);
+		if(pos % WIDTH <= 1 || pos % WIDTH >= WIDTH - 2)
+			board_representation[pos] = BLOCKED_SQUARE;
+		else
+			board_representation[pos] = EMPTY_SQUARE;
 	}
+
 	set_type(BLUE_STONE, 0, 6);
 	set_type(BLUE_STONE, 6, 0);
 	set_type(RED_STONE, 0, 0);
