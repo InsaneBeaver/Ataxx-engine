@@ -53,6 +53,14 @@ void board::init_board()
 			board_representation[pos] = EMPTY_SQUARE;
 	}
 
+	if(board_type == CENTRALGAPS)
+	{
+		set_type(BLOCKED_SQUARE, 2, 2);
+		set_type(BLOCKED_SQUARE, 4, 2);
+		set_type(BLOCKED_SQUARE, 2, 4);
+		set_type(BLOCKED_SQUARE, 4, 4);
+	}
+
 	set_type(BLUE_STONE, 0, 6);
 	set_type(BLUE_STONE, 6, 0);
 	set_type(RED_STONE, 0, 0);
