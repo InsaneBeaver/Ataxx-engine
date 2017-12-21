@@ -78,7 +78,7 @@ double search_tree::negamax(int depth_to_go, double alpha, double beta, int colo
 	double best_value = -10000;
 	uint64_t hash = tt->hash_board(current_node._board);
 	position & position = tt->get_position(hash);
-	bool is_same_position = (position.hash == hash) && (position.depth >= depth_to_go) && (position._board.compare(current_node._board));
+	bool is_same_position = (depth != depth_to_go) && (position.hash == hash) && (position.depth >= depth_to_go) && (position._board.compare(current_node._board));
 	
 	if(is_same_position)
 	{

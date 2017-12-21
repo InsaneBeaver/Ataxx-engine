@@ -10,7 +10,7 @@
 using namespace std;
 
 constexpr unsigned int MAX_DEPTH = 50;
-constexpr size_t DEFAULT_TT_MEMORY = 1e06;
+constexpr size_t DEFAULT_TT_MEMORY = 1e07;
 
 
 struct node
