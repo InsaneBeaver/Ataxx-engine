@@ -139,7 +139,6 @@ double search_tree::negamax(int depth_to_go, double alpha, double beta, int colo
 		tt->add_position(current_node._board, hash, best_value, depth_to_go);
 
 	end: 
-	evals[((short int)(current_node.pv[depth_to_go] << 8) >> 8)]+= 1 * color;
 	return best_value;
 }
 
