@@ -15,16 +15,20 @@ interface::~interface()
 
 void interface::parse_command(char command[1024])
 {
+	if(command == NULL) return;
 	char argv[MAX_ARG_LENGTH][MAX_ARG_NUMBER] = {{0}};
 	int i_argv = 0;
 	int i_arg = 0;
 	
 	bool is_in_quotation_marks = false;
 	char current_char;
-	for(int i_command = 0; i_command < 1024; i_command++)
+	for(int i_command = 0; command[i_command] != '\0'; i_command++)
 	{
 		current_char = command[i_command];
-		if(current_char == '"') 
+		if(current_char == '\n')
+			break;
+
+		else if(current_char == '"') 
 			is_in_quotation_marks = !is_in_quotation_marks;
 
 		else if(current_char == ' ' && !is_in_quotation_marks && i_arg != 0)
