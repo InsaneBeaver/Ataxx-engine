@@ -24,6 +24,8 @@ const char BLUE_STONE_DUPLICATION_ORIGIN_SQUARE = PRODUCTDIMENSIONS;
 const char RED_STONE_DUPLICATION_ORIGIN_SQUARE = PRODUCTDIMENSIONS + 1;
 const char NULLMOVE = 0; 
 
+constexpr unsigned int MAX_MOVES_IN_POSITION = 256;
+
 
 inline char get_square_repr(char square_type)
 {
@@ -49,6 +51,75 @@ inline char get_square_repr(char square_type)
 	return square_repr;
 }
 
+inline char get_square(char square_repr)
+{
+	char square;
+	switch(square_repr)
+	{
+		case '.':
+			square = EMPTY_SQUARE; break;	
+		case 'B':
+			square = BLUE_STONE; break;
+		case 'R':
+			square = RED_STONE; break;
+		case 'x':
+			square = BLOCKED_SQUARE; break;
+	}
+	return square;
+}
+
+inline void get_coordinate_repr(char repr[2], char coordinate)
+{
+	char x = (coordinate - 1) % WIDTH;
+	char y = ((coordinate - 1) - x) / WIDTH;
+	
+	sprintf(repr, "%c%c", x + '`', y + '/');
+	
+}
+
+inline char get_coordinate(char repr[2])
+{
+	char x = repr[0] - '_';
+	char y = repr[1] - '/';
+	
+	return x + y * WIDTH;
+}
+
+inline void get_move_repr(char repr[4], short int move)
+{
+	char origin_square = move >> 8;
+	char destination_square = (move << 8) >> 8;
+	if(origin_square >= PRODUCTDIMENSIONS)
+	{
+		get_coordinate_repr(repr, destination_square);
+		repr[2] = 0;
+	}
+	else
+	{
+		get_coordinate_repr(repr, origin_square);
+		get_coordinate_repr(&repr[2], destination_square);
+	}
+}
+
+inline short int get_move(char repr[4], Sides side)
+{
+	char origin_square, destination_square;
+	if(repr[2] == 0)
+	{
+		origin_square = PRODUCTDIMENSIONS;
+		if(side == RED) origin_square++;
+		destination_square = get_coordinate(repr);
+	}
+	else
+	{
+		origin_square = get_coordinate(repr);
+		destination_square = get_coordinate(&repr[2]);
+	}
+
+	return (origin_square << 8) + destination_square;
+	
+}
+
 struct board
 {
 	board();
@@ -62,10 +133,13 @@ struct board
 	void init_board();
 	void load_board(const char * board_representation, Sides side_to_move);
 	void load_board(board & _board);
+	void load_board(const char * fen);
+	void undo_move(board & old_board, short int move);
 	
 	bool compare(board & _board);
 	
 	Sides side_to_move;
+	unsigned char move_count;
 	char * board_representation;
 	const BoardType board_type;
 };

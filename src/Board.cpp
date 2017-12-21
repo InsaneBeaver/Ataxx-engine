@@ -3,11 +3,29 @@
 board::board(BoardType _board_type) : board_type(_board_type) 
 {
 	board_representation = new char[PRODUCTDIMENSIONS];
+	move_count = 0;
+
+	for(char pos = 0; pos < PRODUCTDIMENSIONS; pos++)
+	{
+		if(pos % WIDTH <= 1 || pos % WIDTH >= WIDTH - 2 || pos < 2 * HEIGHT || pos > PRODUCTDIMENSIONS - 2 * HEIGHT)
+			board_representation[pos] = BLOCKED_SQUARE;
+		else
+			board_representation[pos] = EMPTY_SQUARE;
+	}
 }
 
 board::board() : board_type(CENTRALGAPS)
 {
 	board_representation = new char[PRODUCTDIMENSIONS];
+	move_count = 0;
+
+	for(char pos = 0; pos < PRODUCTDIMENSIONS; pos++)
+	{
+		if(pos % WIDTH <= 1 || pos % WIDTH >= WIDTH - 2 || pos < 2 * HEIGHT || pos > PRODUCTDIMENSIONS - 2 * HEIGHT)
+			board_representation[pos] = BLOCKED_SQUARE;
+		else
+			board_representation[pos] = EMPTY_SQUARE;
+	}
 }
 
 
@@ -18,15 +36,7 @@ board::~board()
 
 
 void board::init_board()
-{
-	for(char pos = 0; pos < PRODUCTDIMENSIONS; pos++)
-	{
-		if(pos % WIDTH <= 1 || pos % WIDTH >= WIDTH - 2 || pos < 2 * HEIGHT || pos > PRODUCTDIMENSIONS - 2 * HEIGHT)
-			board_representation[pos] = BLOCKED_SQUARE;
-		else
-			board_representation[pos] = EMPTY_SQUARE;
-	}
-	
+{	
 	if(board_type == CENTRALGAPS)
 	{
 		set_type(BLOCKED_SQUARE, 2, 2);
@@ -136,7 +146,6 @@ void board::play_move(short int move)
 	
 	const char friendly_stone = side_to_move == BLUE ? BLUE_STONE : RED_STONE;
 	const char ennemy_stone = side_to_move == BLUE ? RED_STONE : BLUE_STONE;
-	
 	board_representation[destination_square] = friendly_stone;
 	for(char delta1 = -1; delta1 <= 1; delta1++)
 		for(char delta2 = -WIDTH; delta2 <= WIDTH; delta2+= WIDTH)
@@ -145,13 +154,35 @@ void board::play_move(short int move)
 	
 	if(side_to_move == BLUE) side_to_move = RED;
 	else side_to_move = BLUE;
+	move_count++;
+}
+
+void board::undo_move(board & old_board, short int move)
+{
+	const char origin_square = move >> 8;
+	const char destination_square = (move << 8) >> 8;
+
+	const char friendly_stone = side_to_move == RED ? BLUE_STONE : RED_STONE;
+	const char ennemy_stone = side_to_move == RED ? RED_STONE : BLUE_STONE;
+	
+	if(origin_square < PRODUCTDIMENSIONS)
+		board_representation[origin_square] = friendly_stone;
+	
+	for(char delta1 = -1; delta1 <= 1; delta1++)
+		for(char delta2 = -WIDTH; delta2 <= WIDTH; delta2+= WIDTH)
+			board_representation[destination_square + delta1 + delta2] = old_board.board_representation[destination_square + delta1 + delta2];
+	
+	if(side_to_move == BLUE) side_to_move = RED;
+	else side_to_move = BLUE;
+	move_count--;
 }
 
 void board::load_board(const char * board_representation, Sides side_to_move)
 {
 	this->side_to_move = side_to_move;
-	for(int pos = 0; pos < PRODUCTDIMENSIONS; pos++)
+	for(int pos = 2 * WIDTH; pos < PRODUCTDIMENSIONS - 2 * WIDTH; pos++)
 		this->board_representation[pos] = board_representation[pos];
+	
 }
 
 void board::load_board(board & _board)
@@ -159,58 +190,32 @@ void board::load_board(board & _board)
 	load_board(_board.board_representation, _board.side_to_move);
 }
 
+void board::load_board(const char * fen)
+{
+	int pos = 2 * WIDTH + 2;
+	int i_fen;
+	for(i_fen = 0; fen[i_fen] != ' '; i_fen++)
+	{
+		if( (WIDTH - pos % WIDTH < 2))
+			pos += 4;
+		else
+		{
+			board_representation[pos] = get_square(fen[i_fen]);
+			pos++;
+		}
+	}
+
+	char square = get_square(fen[i_fen + 1]);
+	if(square == BLUE_STONE) side_to_move = BLUE;
+	else side_to_move = RED;
+}
+
 bool board::compare(board & _board)
 {
 	bool is_identical = true;
 	is_identical &= _board.side_to_move == side_to_move;
-	for(int i = 0; i < PRODUCTDIMENSIONS && is_identical; i++)
+	for(int i = 2 * WIDTH; i < PRODUCTDIMENSIONS - 2 * WIDTH && is_identical; i++)
 		is_identical &= _board.board_representation[i] == board_representation[i];
 	
 	return is_identical;
-}
-
-uint64_t _perft(board boards[20], short int all_moves[20][100], int depth_to_go);
-
-uint64_t perft(int depth)
-{
-
-	short int all_moves[20][100];
-	board boards[20];
-
-	boards[depth - 1].init_board();
-	uint64_t res = _perft(boards, all_moves, depth - 1);
-	
-	return res;
-	
-}
-
-uint64_t _perft(board boards[20], short int all_moves[20][100], int depth_to_go)
-{
-	uint64_t tot = 0;
-	
-	board & currentboard = boards[depth_to_go];
-	
-	Sides side_to_move = currentboard.side_to_move;
-	const char * board_representation = currentboard.board_representation;
-	currentboard.generate_moves(all_moves[depth_to_go]);
-	
-	if(depth_to_go == 0)
-		for(unsigned int iMoves = 0; all_moves[depth_to_go][iMoves] != 0; iMoves++) tot++;
-
-	else
-	{
-		
-		board & nextboard = boards[depth_to_go - 1]; 
-		for(unsigned int iMoves = 0; all_moves[depth_to_go][iMoves] != 0; iMoves++)
-		{
-			nextboard.load_board(board_representation, side_to_move);
-			nextboard.play_move(all_moves[depth_to_go][iMoves]);
-			tot += _perft(boards, all_moves, depth_to_go - 1);
-		}
-	}
-	
-	return tot;
-	
-	
-	
 }

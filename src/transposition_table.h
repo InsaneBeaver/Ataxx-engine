@@ -10,9 +10,10 @@
 
 struct position
 {
-	uint64_t hash;
+	uint64_t hash = 0;
 	board _board;
-	double eval;
+	double eval = 0;
+	unsigned char depth = 0;
 };
 
 
@@ -20,16 +21,16 @@ struct position
 class transposition_table
 {
 	public:
-		transposition_table(int _number_of_positions);
+		transposition_table(size_t _memory);
 		~transposition_table();
 		
 		uint64_t hash_board(board & _board);
-		position * get_position(uint64_t hash);
-		void add_position(board & _board, uint64_t hash, double eval);
+		position & get_position(uint64_t hash);
+		void add_position(board & _board, uint64_t hash, double eval, unsigned char depth);
 	private:
 		uint64_t **hash_keys;
-		const unsigned int number_of_positions;
-		position* * positions;
+		const size_t number_of_positions;
+		position *positions;
 		
 };
 

@@ -21,3 +21,6 @@ double evaluate(board & _board)
 	if(_board.side_to_move == RED) tot *= -1;
 	return tot;
 }
+
+
+

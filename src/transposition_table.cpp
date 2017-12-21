@@ -11,10 +11,10 @@ inline uint64_t lrand()
 }
 
 
-transposition_table::transposition_table(int _number_of_positions) : number_of_positions(_number_of_positions)
+transposition_table::transposition_table(size_t memory) : number_of_positions(memory / sizeof(position))
 {
 	assert(number_of_positions > 0);
-	positions = new position*[number_of_positions]();
+	positions = new position[number_of_positions]();
 	
 	const unsigned int hash_keys_size = (WIDTH - 2) * (HEIGHT - 2);
 	hash_keys = new uint64_t*[hash_keys_size];
@@ -28,40 +28,40 @@ transposition_table::transposition_table(int _number_of_positions) : number_of_p
 
 transposition_table::~transposition_table()
 {
-	for(int i = 0; i < number_of_positions; i++)
-		if(positions[i] != NULL)
-			delete positions[i];
-	
 	delete[] positions;
+
+	for(int i = 0; i < (WIDTH - 2) * (HEIGHT - 2); i++)
+		delete[] hash_keys[i];
+	
+	delete[] hash_keys;
 }
 
 uint64_t transposition_table::hash_board(board & _board)
 {
 	unsigned int position_counter = 0;
 	uint64_t hash = 0;
-	for(int i = 2 * WIDTH; i < PRODUCTDIMENSIONS - 2 * WIDTH; i++)
+	for(int i = 0; i < PRODUCTDIMENSIONS; i++)
 	{
-		if(i % WIDTH < 2 || WIDTH - i % WIDTH < 2) continue;
+		if(_board.board_representation[i] == BLOCKED_SQUARE) continue;
 		hash ^= hash_keys[position_counter][_board.board_representation[i]];
+		position_counter++;
+	}	
 		
-	}
 	return hash;
 }
 
-position * transposition_table::get_position(uint64_t hash)
+position & transposition_table::get_position(uint64_t hash)
 {
 	return positions[hash % number_of_positions];
 }
-
-void transposition_table::add_position(board & _board, uint64_t hash, double eval)
+int a = 0;
+void transposition_table::add_position(board & _board, uint64_t hash, double eval, unsigned char depth)
 {
-	position * new_position = new position;
-	new_position->hash = hash;
-	new_position->_board.load_board(_board);
-	new_position->eval = eval;
 	unsigned int index = hash % number_of_positions;
-	if(positions[index] != NULL)
-		delete positions[index];
-	
-	positions[index] = new_position;
+	position & new_position = positions[index];
+	new_position.hash = hash;
+	new_position._board.load_board(_board);
+	new_position.eval = eval;
+	new_position.depth = depth;
+
 }
